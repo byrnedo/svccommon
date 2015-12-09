@@ -1,5 +1,7 @@
 package web
+
 import (
+	"gopkg.in/bluesuncorp/validator.v8"
 	"net/http"
 )
 
@@ -25,7 +27,7 @@ type ErrorResponse struct {
 }
 
 type Source struct {
-	Pointer string `json:"pointer,omitempty"`
+	Pointer   string `json:"pointer,omitempty"`
 	Parameter string `json:"parameter,omitempty"`
 }
 
@@ -37,10 +39,10 @@ type Source struct {
 //	"detail": "First name must contain at least three characters."
 //}
 type ErrorMsg struct {
-	Code   int    `json:"status"`
+	Code   int     `json:"status"`
 	Source *Source `json:"source,omitempty"`
-	Title  string `json:"title,omitempty"`
-	Detail string `json:"detail"`
+	Title  string  `json:"title,omitempty"`
+	Detail string  `json:"detail"`
 }
 
 func NewErrorResponse() *ErrorResponse {
@@ -49,9 +51,9 @@ func NewErrorResponse() *ErrorResponse {
 
 func (e *ErrorResponse) AddError(code int, src *Source, title string, detail string) *ErrorResponse {
 	e.Errors = append(e.Errors, &ErrorMsg{
-		Code: code,
+		Code:   code,
 		Source: src,
-		Title: title,
+		Title:  title,
 		Detail: detail,
 	})
 	return e
@@ -59,11 +61,18 @@ func (e *ErrorResponse) AddError(code int, src *Source, title string, detail str
 
 func (e *ErrorResponse) AddCodeError(code int) *ErrorResponse {
 	e.Errors = append(e.Errors, &ErrorMsg{
-		Code: code,
+		Code:   code,
 		Source: nil,
-		Title: "",
+		Title:  http.StatusText(code),
 		Detail: http.StatusText(code),
 	})
 	return e
 }
 
+func NewValidationErrorResonse(valErrs validator.ValidationErrors) *ErrorResponse {
+	errResponse := NewErrorResponse()
+	for field, fieldErr := range valErrs {
+		errResponse.AddError(400, &Source{Pointer: field}, fieldErr.Tag, fieldErr.Tag)
+	}
+	return errResponse
+}
