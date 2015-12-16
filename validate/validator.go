@@ -7,7 +7,7 @@ import (
 var V *validator.Validate
 
 func init() {
-	V = validator.New(&validator.Config{TagName: "validate"})
+	V = validator.New(&validator.Config{TagName: "validate", FieldNameTag: "json"})
 }
 
 func ValidateStruct(any interface{}) (valErrors validator.ValidationErrors) {
