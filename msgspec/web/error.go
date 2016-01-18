@@ -1,9 +1,10 @@
 package web
 
 import (
+	//"fmt"
 	"gopkg.in/bluesuncorp/validator.v8"
 	"net/http"
-	"fmt"
+	"strings"
 )
 
 // JSON-API error response
@@ -71,9 +72,12 @@ func (e *ErrorResponse) AddCodeError(code int) *ErrorResponse {
 }
 
 func NewValidationErrorResonse(valErrs validator.ValidationErrors) *ErrorResponse {
+	var jsonKey string
 	errResponse := NewErrorResponse()
 	for _, fieldErr := range valErrs {
-		errResponse.AddError(400, &Source{Pointer: fieldErr.Name}, fieldErr.Tag, fieldErr.Tag)
+		jsonKeyArr := strings.SplitN(fieldErr.NameNamespace, ".", 2)
+		jsonKey = jsonKeyArr[len(jsonKeyArr) - 1]
+		errResponse.AddError(400, &Source{Pointer: jsonKey}, fieldErr.Tag, fieldErr.Tag)
 	}
 	return errResponse
 }

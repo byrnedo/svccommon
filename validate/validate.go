@@ -3,21 +3,21 @@ package validate
 import (
 	"gopkg.in/bluesuncorp/validator.v8"
 	"reflect"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 var (
 	V *validator.Validate
 )
 
-var customValidators = map[string]validator.Func {
-	"oneof" : isIn,
+var customValidators = map[string]validator.Func{
+	"oneof": isIn,
 }
 
 func init() {
 	V = validator.New(&validator.Config{
-		TagName: "validate",
+		TagName:      "validate",
 		FieldNameTag: "json",
 	})
 
@@ -55,9 +55,17 @@ func isIn(v *validator.Validate, topStruct reflect.Value, currentStruct reflect.
 	return false
 }
 
-func ValidateStruct(s interface{}) validator.ValidationErrors {
-	if err := V.Struct(s); err != nil {
-		return err.(validator.ValidationErrors)
+func ValidateStruct(any interface{}) (valErrors validator.ValidationErrors) {
+
+	if errs := V.Struct(any); errs != nil {
+		valErrors = errs.(validator.ValidationErrors)
 	}
-	return map[string]*validator.FieldError{}
+	return
 }
+
+//func ValidateStruct(s interface{}) validator.ValidationErrors {
+//	if err := V.Struct(s); err != nil {
+//		return err.(validator.ValidationErrors)
+//	}
+//	return map[string]*validator.FieldError{}
+//}
