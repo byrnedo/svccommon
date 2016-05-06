@@ -5,15 +5,27 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"regexp"
+)
+
+const (
+	anyLanguageCharsRegexString = `^[\p{L}]+$`
+	anyLanguageNameRegexString = `^\p{L}[\p{L}\s]*\p{L}$`
 )
 
 var (
 	V *validator.Validate
+	anyLanguageCharsRegex = regexp.MustCompile(anyLanguageCharsRegexString)
+	anyLanguageNameRegex = regexp.MustCompile(anyLanguageNameRegexString)
 )
 
 var customValidators = map[string]validator.Func{
 	"oneof": isIn,
+	"anylangchars": anyLanguageChars,
+	"anylangname": anyLanguageName,
 }
+
+
 
 func init() {
 	V = validator.New(&validator.Config{
@@ -53,6 +65,14 @@ func isIn(v *validator.Validate, topStruct reflect.Value, currentStruct reflect.
 		return field.String() == item
 	}
 	return false
+}
+
+func anyLanguageChars(v *validator.Validate, topStruct reflect.Value, currentStruct reflect.Value, field reflect.Value, fieldtype reflect.Type, fieldKind reflect.Kind, param string) bool {
+	return anyLanguageCharsRegex.MatchString(field.String())
+}
+
+func anyLanguageName(v *validator.Validate, topStruct reflect.Value, currentStruct reflect.Value, field reflect.Value, fieldtype reflect.Type, fieldKind reflect.Kind, param string) bool {
+	return anyLanguageNameRegex.MatchString(field.String())
 }
 
 func ValidateStruct(any interface{}) (valErrors validator.ValidationErrors) {
