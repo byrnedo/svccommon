@@ -1,5 +1,5 @@
 syntax = "proto2";
-package common
+package common;
 
 message Timestamp {
     // Represents seconds of UTC time since Unix epoch
