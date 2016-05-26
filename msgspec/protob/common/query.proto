@@ -1,0 +1,15 @@
+syntax = "proto2";
+package common;
+
+message Query {
+    message Filter {
+        optional string attribute = 1;
+        //optional string comparator = 2;
+        optional string value = 3;
+
+    }
+    optional int32 limit = 2;
+    optional int32 offset = 3;
+    repeated string orderBy = 4;
+    repeated Filter filter = 5;
+}
